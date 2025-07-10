@@ -120,8 +120,7 @@
 
     function copyField(fieldId) {
       const field = document.getElementById(fieldId);
-      navigator.clipboard.writeText(field.value)
-        .then(() => alert(`Đã copy: ${fieldId.split('_').pop()}`));
+      navigator.clipboard.writeText(field.value).then(() => {});
     }
 
     function resetAccount(id) {
@@ -146,7 +145,6 @@
       const existing = JSON.parse(localStorage.getItem('accounts')) || {};
       existing[platformKey] = data;
       localStorage.setItem('accounts', JSON.stringify(existing));
-      alert(`Đã lưu thông tin cho ${platformKey.toUpperCase()}!`);
     }
 
     window.onload = renderPlatforms;
