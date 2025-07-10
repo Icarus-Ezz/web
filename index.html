@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WebSite Quản Lí</title>
-  <link rel="icon" href="https://kynguyenlamdep.com/wp-content/uploads/2022/08/anh-anime-toc-hong-cute.jpg">
+  <title>Quản lý tài khoản</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
     @keyframes slideIn {
@@ -50,9 +49,9 @@
       <h2 class="text-2xl font-bold text-purple-700 mb-4">Thông tin</h2>
 
       <div class="bg-gray-100 p-4 rounded-xl space-y-3">
-        <label class="block font-semibold">Authorization:</label>
+        <label class="block font-semibold">Tác giả:</label>
         <div class="flex gap-2">
-          <input id="author" class="flex-1 px-3 py-2 border rounded-xl" value="Chưa cập nhật">
+          <input id="author" class="flex-1 px-3 py-2 border rounded-xl" value="">
           <button onclick="copyField('author')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
         </div>
       </div>
@@ -60,7 +59,7 @@
       <div class="bg-gray-100 p-4 rounded-xl space-y-3">
         <label class="block font-semibold">Link tải:</label>
         <div class="flex gap-2">
-          <input id="download-link" class="flex-1 px-3 py-2 border rounded-xl" value="https://example.com/link-tai">
+          <input id="download-link" class="flex-1 px-3 py-2 border rounded-xl" value="">
           <button onclick="copyField('download-link')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
         </div>
       </div>
@@ -71,6 +70,10 @@
           <li><span class="font-semibold">Lệnh 1:</span> <code>npm install</code></li>
           <li><span class="font-semibold">Lệnh 2:</span> <code>npm start</code></li>
         </ul>
+      </div>
+
+      <div class="flex justify-end">
+        <button onclick="saveInfo()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">Lưu thông tin</button>
       </div>
     </div>
   </div>
@@ -92,13 +95,10 @@
 
     function showToast(message, type = 'success') {
       const toast = document.createElement('div');
-      toast.className = `px-4 py-2 rounded-lg shadow text-white text-sm animate-slide-in opacity-90
-        ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+      toast.className = `px-4 py-2 rounded-lg shadow text-white text-sm animate-slide-in opacity-90 ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
       toast.textContent = message;
-
       const container = document.getElementById('toast-container');
       container.appendChild(toast);
-
       setTimeout(() => {
         toast.classList.add('opacity-0');
         setTimeout(() => toast.remove(), 500);
@@ -108,10 +108,8 @@
     function renderPlatforms() {
       const container = document.getElementById('networks');
       const savedData = JSON.parse(localStorage.getItem('accounts')) || {};
-
       socialPlatforms.forEach(platform => {
         counters[platform.key] = 1;
-
         const section = document.createElement('div');
         section.innerHTML = `
           <div class="bg-white rounded-2xl shadow-xl">
@@ -126,14 +124,15 @@
               <button onclick="addAccount('${platform.key}')" class="bg-${platform.color}-600 hover:bg-${platform.color}-700 text-white px-4 py-2 rounded-xl">+ Thêm tài khoản</button>
               <div id="${platform.key}_accounts" class="space-y-4"></div>
             </div>
-          </div>
-        `;
+          </div>`;
         container.appendChild(section);
-
         const dataList = savedData[platform.key] || [];
         dataList.forEach(data => addAccount(platform.key, data));
         if (dataList.length === 0) addAccount(platform.key);
       });
+      const savedInfo = JSON.parse(localStorage.getItem('info')) || {};
+      if (savedInfo.author) document.getElementById('author').value = savedInfo.author;
+      if (savedInfo.downloadLink) document.getElementById('download-link').value = savedInfo.downloadLink;
     }
 
     function toggleCollapse(key) {
@@ -145,19 +144,15 @@
       const container = document.getElementById(`${platformKey}_accounts`);
       const id = `${platformKey}_acc_${counters[platformKey]++}`;
       const accountNumber = counters[platformKey] - 1;
-
       const username = existingData?.username || "";
       const password = existingData?.password || "";
       const cookie = existingData?.cookie || "";
-
       const html = `
         <div id="${id}" class="bg-gray-50 border rounded-2xl p-4 space-y-3 shadow relative group">
           <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
             <button onclick="removeAccount('${id}', '${platformKey}')" class="bg-red-500 hover:bg-red-600 text-white px-2 rounded-xl">X</button>
           </div>
-
           <div class="font-bold text-gray-700">Tài khoản #${accountNumber}</div>
-
           <div>
             <label class="block text-sm font-medium">Tài khoản</label>
             <div class="flex gap-2">
@@ -165,7 +160,6 @@
               <button onclick="copyField('${id}_username')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
             </div>
           </div>
-
           <div>
             <label class="block text-sm font-medium">Mật khẩu</label>
             <div class="flex gap-2">
@@ -173,7 +167,6 @@
               <button onclick="copyField('${id}_password')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
             </div>
           </div>
-
           <div>
             <label class="block text-sm font-medium">Cookie</label>
             <div class="flex gap-2">
@@ -181,13 +174,11 @@
               <button onclick="copyField('${id}_cookie')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl h-fit">Copy</button>
             </div>
           </div>
-
           <div class="flex gap-2 justify-end">
             <button onclick="resetAccount('${id}')" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-1.5 rounded-xl">Hủy</button>
             <button onclick="saveAccount('${platformKey}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-xl">Lưu</button>
           </div>
-        </div>
-      `;
+        </div>`;
       container.insertAdjacentHTML('beforeend', html);
     }
 
@@ -212,7 +203,6 @@
     function saveAccount(platformKey) {
       const container = document.getElementById(`${platformKey}_accounts`);
       const children = Array.from(container.children);
-
       const data = children.map(el => {
         const id = el.id;
         return {
@@ -221,7 +211,6 @@
           cookie: document.getElementById(`${id}_cookie`).value,
         };
       });
-
       try {
         const existing = JSON.parse(localStorage.getItem('accounts')) || {};
         existing[platformKey] = data;
@@ -232,12 +221,22 @@
       }
     }
 
+    function saveInfo() {
+      const author = document.getElementById('author').value;
+      const downloadLink = document.getElementById('download-link').value;
+      try {
+        localStorage.setItem('info', JSON.stringify({ author, downloadLink }));
+        showToast("Đã lưu thông tin cá nhân");
+      } catch (e) {
+        showToast("Lỗi khi lưu thông tin", "error");
+      }
+    }
+
     function switchTab(tab) {
       document.getElementById('main-tab').classList.add('hidden');
       document.getElementById('info-tab').classList.add('hidden');
       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('bg-purple-600', 'text-white'));
       document.querySelectorAll('.tab-button').forEach(btn => btn.classList.add('bg-purple-200', 'text-purple-700'));
-
       if (tab === 'main') {
         document.getElementById('main-tab').classList.remove('hidden');
         document.querySelectorAll('.tab-button')[0].classList.add('bg-purple-600', 'text-white');
