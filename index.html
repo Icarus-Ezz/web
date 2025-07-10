@@ -5,15 +5,31 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Quản lý tài khoản</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+    .animate-slide-in {
+      animation: slideIn 0.3s ease-out;
+    }
+  </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-100 via-pink-100 to-yellow-100 min-h-screen p-6">
 
   <div class="max-w-6xl mx-auto space-y-8">
     <h1 class="text-4xl font-bold text-center text-purple-700 mb-6">Quản lý tài khoản mạng xã hội</h1>
-
-    <!-- Khối mạng xã hội -->
     <div id="networks" class="space-y-6"></div>
   </div>
+
+  <!-- Toast Notifications -->
+  <div id="toast-container" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
 
   <script>
     const socialPlatforms = [
@@ -24,6 +40,21 @@
     ];
 
     const counters = {};
+
+    function showToast(message, type = 'success') {
+      const toast = document.createElement('div');
+      toast.className = `px-4 py-2 rounded-lg shadow text-white text-sm animate-slide-in opacity-90
+        ${type === 'error' ? 'bg-red-500' : 'bg-green-500'}`;
+      toast.textContent = message;
+
+      const container = document.getElementById('toast-container');
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0');
+        setTimeout(() => toast.remove(), 500);
+      }, 3000);
+    }
 
     function renderPlatforms() {
       const container = document.getElementById('networks');
@@ -52,8 +83,7 @@
 
         const dataList = savedData[platform.key] || [];
         dataList.forEach(data => addAccount(platform.key, data));
-
-        if (dataList.length === 0) addAccount(platform.key); // nếu chưa có thì thêm mặc định
+        if (dataList.length === 0) addAccount(platform.key); // Thêm mặc định nếu chưa có
       });
     }
 
@@ -113,14 +143,15 @@
     }
 
     function removeAccount(id, platformKey) {
-      const el = document.getElementById(id);
-      el.remove();
-      saveAccount(platformKey); // cập nhật lại localStorage sau khi xoá
+      document.getElementById(id).remove();
+      saveAccount(platformKey); // cập nhật lại sau khi xóa
     }
 
     function copyField(fieldId) {
       const field = document.getElementById(fieldId);
-      navigator.clipboard.writeText(field.value).then(() => {});
+      navigator.clipboard.writeText(field.value)
+        .then(() => showToast("Đã sao chép thành công"))
+        .catch(() => showToast("Lỗi khi sao chép!", "error"));
     }
 
     function resetAccount(id) {
@@ -142,9 +173,14 @@
         };
       });
 
-      const existing = JSON.parse(localStorage.getItem('accounts')) || {};
-      existing[platformKey] = data;
-      localStorage.setItem('accounts', JSON.stringify(existing));
+      try {
+        const existing = JSON.parse(localStorage.getItem('accounts')) || {};
+        existing[platformKey] = data;
+        localStorage.setItem('accounts', JSON.stringify(existing));
+        showToast(`Đã lưu tài khoản ${platformKey.toUpperCase()}`);
+      } catch (e) {
+        showToast("Lỗi khi lưu dữ liệu!", "error");
+      }
     }
 
     window.onload = renderPlatforms;
