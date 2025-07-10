@@ -1,175 +1,155 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quản lý Tài Khoản</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-        }
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 30px;
-        }
-        .container {
-            max-width: 700px;
-            margin: auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-        }
-        .app-section {
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 15px;
-            transition: background 0.3s, transform 0.3s;
-        }
-        .app-section:hover {
-            background: #f7f7f7;
-            transform: scale(1.02);
-        }
-        .app-section h2 {
-            margin: 10px 0;
-            display: flex;
-            align-items: center;
-            font-size: 1.5em;
-            color: #007bff;
-        }
-        .app-icon {
-            width: 40px;
-            height: 40px;
-            margin-right: 10px;
-        }
-        .account {
-            margin: 10px 0;
-            padding: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.3s;
-        }
-        .account:hover {
-            background: #d1d1d1;
-        }
-        .copy-button {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 5px 10px;
-            cursor: pointer;
-            transition: background 0.3s, transform 0.2s;
-        }
-        .copy-button:hover {
-            background-color: #0056b3;
-            transform: scale(1.05);
-        }
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 0.9em;
-            color: #666;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Quản lý tài khoản</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gradient-to-br from-indigo-100 via-pink-100 to-yellow-100 min-h-screen p-6">
 
-<div class="container">
-    <h1>Quản lý Tài Khoản</h1>
-    
-    <div class="input-section" style="margin-bottom: 30px; padding: 15px; background: #f7f7f7; border-radius: 5px;">
-        <h2>Thêm Tài Khoản Mới</h2>
-        <form id="accountForm">
-            <div style="margin-bottom: 10px;">
-                <label>Ứng dụng:</label>
-                <select id="appSelect" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd;">
-                    <option value="facebook">Facebook</option>
-                    <option value="google">Google</option>
-                    <option value="twitter">Twitter</option>
-                    <option value="instagram">Instagram</option>
-                </select>
+  <div class="max-w-6xl mx-auto space-y-8">
+    <h1 class="text-4xl font-bold text-center text-purple-700 mb-6">Quản lý tài khoản mạng xã hội</h1>
+
+    <!-- Khối mạng xã hội -->
+    <div id="networks" class="space-y-6"></div>
+  </div>
+
+  <script>
+    const socialPlatforms = [
+      { key: 'fb', name: 'Facebook', color: 'blue', icon: 'https://cdn-icons-png.flaticon.com/512/733/733547.png' },
+      { key: 'gg', name: 'Google', color: 'red', icon: 'https://cdn-icons-png.flaticon.com/512/2702/2702602.png' },
+      { key: 'thr', name: 'Threads', color: 'black', icon: 'https://cdn-icons-png.flaticon.com/512/12314/12314247.png' },
+      { key: 'tt', name: 'TikTok', color: 'gray', icon: 'https://cdn-icons-png.flaticon.com/512/3046/3046120.png' },
+    ];
+
+    const counters = {};
+
+    function renderPlatforms() {
+      const container = document.getElementById('networks');
+      const savedData = JSON.parse(localStorage.getItem('accounts')) || {};
+
+      socialPlatforms.forEach(platform => {
+        counters[platform.key] = 1;
+
+        const section = document.createElement('div');
+        section.innerHTML = `
+          <div class="bg-white rounded-2xl shadow-xl">
+            <div class="flex justify-between items-center p-4 cursor-pointer bg-${platform.color}-100 rounded-t-2xl" onclick="toggleCollapse('${platform.key}')">
+              <div class="flex items-center gap-3">
+                <img src="${platform.icon}" class="w-8 h-8" />
+                <h2 class="text-xl font-bold text-${platform.color}-700">${platform.name}</h2>
+              </div>
+              <span class="text-${platform.color}-700 font-bold text-lg select-none">▼</span>
             </div>
-            <div style="margin-bottom: 10px;">
-                <label>Tài khoản:</label>
-                <input type="text" id="accountInput" placeholder="Nhập tài khoản/email" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd; width: 60%;">
+            <div id="${platform.key}_content" class="p-4 space-y-4">
+              <button onclick="addAccount('${platform.key}')" class="bg-${platform.color}-600 hover:bg-${platform.color}-700 text-white px-4 py-2 rounded-xl">+ Thêm tài khoản</button>
+              <div id="${platform.key}_accounts" class="space-y-4"></div>
             </div>
-            <button type="button" onclick="saveAccount()" style="background-color: #28a745; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">Lưu</button>
-        </form>
-    </div>
+          </div>
+        `;
+        container.appendChild(section);
 
-    <div class="app-section">
-        <h2><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="app-icon"> Facebook</h2>
-        <div class="account">
-            Tài khoản: user1@example.com
-            <button class="copy-button" onclick="copyToClipboard('user1@example.com')">Copy</button>
-        </div>
-        <div class="account">
-            Tài khoản: user2@example.com
-            <button class="copy-button" onclick="copyToClipboard('user2@example.com')">Copy</button>
-        </div>
-    </div>
+        const dataList = savedData[platform.key] || [];
+        dataList.forEach(data => addAccount(platform.key, data));
 
-    <div class="app-section">
-        <h2><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Google_%22G%22_Logo.svg" alt="Google" class="app-icon"> Google</h2>
-        <div class="account">
-            Tài khoản: user3@example.com
-            <button class="copy-button" onclick="copyToClipboard('user3@example.com')">Copy</button>
-        </div>
-    </div>
-
-    <div class="app-section">
-        <h2><img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/60/Twitter_bird_logo_2012.svg/1200px-Twitter_bird_logo_2012.svg.png" alt="Twitter" class="app-icon"> Twitter</h2>
-        <div class="account">
-            Tài khoản: user4@example.com
-            <button class="copy-button" onclick="copyToClipboard('user4@example.com')">Copy</button>
-        </div>
-    </div>
-
-    <div class="app-section">
-        <h2><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="app-icon"> Instagram</h2>
-        <div class="account">
-            Tài khoản: user5@example.com
-            <button class="copy-button" onclick="copyToClipboard('user5@example.com')">Copy</button>
-        </div>
-    </div>
-
-    <div class="footer">
-        &copy; 2023 Quản lý Tài Khoản. Tất cả quyền được bảo lưu.
-    </div>
-</div>
-
-<script>
-    function saveAccount() {
-        const app = document.getElementById('appSelect').value;
-        const account = document.getElementById('accountInput').value.trim();
-        
-        if (!account) {
-            alert('Vui lòng nhập tài khoản');
-            return;
-        }
-        
-        // Here you would typically save to localStorage or a database
-        alert(`Đã lưu tài khoản ${account} cho ứng dụng ${app}`);
-        document.getElementById('accountInput').value = '';
+        if (dataList.length === 0) addAccount(platform.key); // nếu chưa có thì thêm mặc định
+      });
     }
 
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(function() {
-            alert('Đã sao chép: ' + text);
-        }, function(err) {
-            console.error('Không thể sao chép: ', err);
-        });
+    function toggleCollapse(key) {
+      const content = document.getElementById(`${key}_content`);
+      content.classList.toggle('hidden');
     }
-</script>
 
+    function addAccount(platformKey, existingData = null) {
+      const container = document.getElementById(`${platformKey}_accounts`);
+      const id = `${platformKey}_acc_${counters[platformKey]++}`;
+      const accountNumber = counters[platformKey] - 1;
+
+      const username = existingData?.username || "";
+      const password = existingData?.password || "";
+      const cookie = existingData?.cookie || "";
+
+      const html = `
+        <div id="${id}" class="bg-gray-50 border rounded-xl p-4 space-y-3 shadow relative group">
+          <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
+            <button onclick="removeAccount('${id}', '${platformKey}')" class="bg-red-500 hover:bg-red-600 text-white px-2 rounded-xl">X</button>
+          </div>
+
+          <div class="font-bold text-gray-700">Tài khoản #${accountNumber}</div>
+
+          <div>
+            <label class="block text-sm font-medium">Tài khoản</label>
+            <div class="flex gap-2">
+              <input id="${id}_username" class="flex-1 px-3 py-2 border rounded-xl" value="${username}">
+              <button onclick="copyField('${id}_username')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Mật khẩu</label>
+            <div class="flex gap-2">
+              <input id="${id}_password" type="password" class="flex-1 px-3 py-2 border rounded-xl" value="${password}">
+              <button onclick="copyField('${id}_password')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium">Cookie</label>
+            <div class="flex gap-2">
+              <textarea id="${id}_cookie" rows="2" class="flex-1 px-3 py-2 border rounded-xl">${cookie}</textarea>
+              <button onclick="copyField('${id}_cookie')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl h-fit">Copy</button>
+            </div>
+          </div>
+
+          <div class="flex gap-2 justify-end">
+            <button onclick="resetAccount('${id}')" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-1.5 rounded-xl">Hủy</button>
+            <button onclick="saveAccount('${platformKey}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-xl">Lưu</button>
+          </div>
+        </div>
+      `;
+      container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function removeAccount(id, platformKey) {
+      const el = document.getElementById(id);
+      el.remove();
+      saveAccount(platformKey); // cập nhật lại localStorage sau khi xoá
+    }
+
+    function copyField(fieldId) {
+      const field = document.getElementById(fieldId);
+      navigator.clipboard.writeText(field.value)
+        .then(() => alert(`Đã copy: ${fieldId.split('_').pop()}`));
+    }
+
+    function resetAccount(id) {
+      document.getElementById(`${id}_username`).value = '';
+      document.getElementById(`${id}_password`).value = '';
+      document.getElementById(`${id}_cookie`).value = '';
+    }
+
+    function saveAccount(platformKey) {
+      const container = document.getElementById(`${platformKey}_accounts`);
+      const children = Array.from(container.children);
+
+      const data = children.map(el => {
+        const id = el.id;
+        return {
+          username: document.getElementById(`${id}_username`).value,
+          password: document.getElementById(`${id}_password`).value,
+          cookie: document.getElementById(`${id}_cookie`).value,
+        };
+      });
+
+      const existing = JSON.parse(localStorage.getItem('accounts')) || {};
+      existing[platformKey] = data;
+      localStorage.setItem('accounts', JSON.stringify(existing));
+      alert(`Đã lưu thông tin cho ${platformKey.toUpperCase()}!`);
+    }
+
+    window.onload = renderPlatforms;
+  </script>
 </body>
 </html>
