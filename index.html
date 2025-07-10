@@ -1,98 +1,175 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Profile</title
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <link rel="icon" href="https://images-ext-1.discordapp.net/external/oY3IzCcrSLI8TfqjZf_TDPN5whbviE_PGqQqzJd2GYE/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/1253726505402499203/6602147533b258ea90daf9b2c4a45176.png?format=webp&quality=lossless&width=476&height=476" type="image/png">                         
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    html, body {
-      height: 100%;
-      overflow: hidden;
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #video-bg {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      object-fit: cover;
-      z-index: -2;
-      filter: brightness(0.5);
-    }
-
-    .intro-box {
-      text-align: center;
-      color: white;
-      z-index: 1;
-      padding: 20px;
-      background-color: rgba(0, 0, 0, 0.5);
-      border-radius: 10px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.6);
-    }
-
-    .intro-box img {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid white;
-      margin-bottom: 15px;
-    }
-
-    h1 {
-      font-size: 2em;
-      margin-bottom: 10px;
-      text-shadow: 0 0 15px #00faff;
-    }
-
-    p {
-      font-size: 1.1em;
-      margin-bottom: 20px;
-      opacity: 0.9;
-    }
-
-    .social-links a {
-      display: inline-block;
-      margin: 0 10px;
-      padding: 10px 20px;
-      border-radius: 8px;
-      background-color: #00faff;
-      color: black;
-      text-decoration: none;
-      transition: 0.3s;
-    }
-
-    .social-links a:hover {
-      background-color: #00bcd4;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quản lý Tài Khoản</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+        .app-section {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            transition: background 0.3s, transform 0.3s;
+        }
+        .app-section:hover {
+            background: #f7f7f7;
+            transform: scale(1.02);
+        }
+        .app-section h2 {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+            font-size: 1.5em;
+            color: #007bff;
+        }
+        .app-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+        .account {
+            margin: 10px 0;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+        .account:hover {
+            background: #d1d1d1;
+        }
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+        .copy-button:hover {
+            background-color: #0056b3;
+            transform: scale(1.05);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
 </head>
 <body>
 
-  <!-- Nền video -->
-  <video id="video-bg" autoplay muted loop playsinline>
-    <source src="https://cdn.discordapp.com/attachments/1363490003933728768/1369215657148944405/Blue_Archive_Wakamo_Live2D_1080p.mp4?ex=681b0cf3&is=6819bb73&hm=f47ad8c8579f6bb9e9c4e66be1097767e972929b9abfaa9b3de7833ff3df1ffc&" type="video/mp4">
-  </video>
-
-  <!-- Thông tin giới thiệu -->
-  <div class="intro-box" id="profile">
-    <img id="avatar" src="https://images-ext-1.discordapp.net/external/oY3IzCcrSLI8TfqjZf_TDPN5whbviE_PGqQqzJd2GYE/%3Fsize%3D4096/https/cdn.discordapp.com/avatars/1253726505402499203/6602147533b258ea90daf9b2c4a45176.png?format=webp&quality=lossless&width=476&height=476" alt="Avatar" />
-    <h1 id="name">Hello, I am KhoitongDz</h1>
-    <p id="desc">Dưới bầu trời sao, tình yêu em trao,
-Nhẹ nhàng như gió, vương vấn trong nhau.</p>
-    <div class="social-links">
-      <a id="ytlink" href="https://www.youtube.com/@khoitongDZ999" target="_blank">YouTube</a>
-      <a id="dslink" href="https://discord.gg/2NpBPjM4PF" target="_blank">Discord</a>
+<div class="container">
+    <h1>Quản lý Tài Khoản</h1>
+    
+    <div class="input-section" style="margin-bottom: 30px; padding: 15px; background: #f7f7f7; border-radius: 5px;">
+        <h2>Thêm Tài Khoản Mới</h2>
+        <form id="accountForm">
+            <div style="margin-bottom: 10px;">
+                <label>Ứng dụng:</label>
+                <select id="appSelect" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd;">
+                    <option value="facebook">Facebook</option>
+                    <option value="google">Threads</option>
+                    <option value="twitter">Twitter</option>
+                    <option value="instagram">Instagram</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 10px;">
+                <label>Tài khoản:</label>
+                <input type="text" id="accountInput" placeholder="Nhập tài khoản/email" style="padding: 5px; border-radius: 3px; border: 1px solid #ddd; width: 60%;">
+            </div>
+            <button type="button" onclick="saveAccount()" style="background-color: #28a745; color: white; padding: 8px 15px; border: none; border-radius: 5px; cursor: pointer;">Lưu</button>
+        </form>
     </div>
-  </div>
+
+    <div class="app-section">
+        <h2><img src="https://upload.wikimedia.org/wikipedia/commons/5/51/Facebook_f_logo_%282019%29.svg" alt="Facebook" class="app-icon"> Facebook</h2>
+        <div class="account">
+            Tài khoản: 1
+            <button class="copy-button" onclick="copyToClipboard('user1@example.com')">Copy</button>
+        </div>
+        <div class="account">
+            Tài khoản: user2@example.com
+            <button class="copy-button" onclick="copyToClipboard('user2@example.com')">Copy</button>
+        </div>
+    </div>
+
+    <div class="app-section">
+        <h2><img src="https://upload.wikimedia.org/wikipedia/commons/4/4e/Google_%22G%22_Logo.svg" alt="Google" class="app-icon"> Google</h2>
+        <div class="account">
+            Tài khoản: user3@example.com
+            <button class="copy-button" onclick="copyToClipboard('user3@example.com')">Copy</button>
+        </div>
+    </div>
+
+    <div class="app-section">
+        <h2><img src="https://upload.wikimedia.org/wikipedia/en/thumb/6/60/Twitter_bird_logo_2012.svg/1200px-Twitter_bird_logo_2012.svg.png" alt="Twitter" class="app-icon"> Twitter</h2>
+        <div class="account">
+            Tài khoản: user4@example.com
+            <button class="copy-button" onclick="copyToClipboard('user4@example.com')">Copy</button>
+        </div>
+    </div>
+
+    <div class="app-section">
+        <h2><img src="https://upload.wikimedia.org/wikipedia/commons/a/a5/Instagram_icon.png" alt="Instagram" class="app-icon"> Instagram</h2>
+        <div class="account">
+            Tài khoản: user5@example.com
+            <button class="copy-button" onclick="copyToClipboard('user5@example.com')">Copy</button>
+        </div>
+    </div>
+
+    <div class="footer">
+        &copy; 2023 Quản lý Tài Khoản. Tất cả quyền được bảo lưu.
+    </div>
+</div>
+
+<script>
+    function saveAccount() {
+        const app = document.getElementById('appSelect').value;
+        const account = document.getElementById('accountInput').value.trim();
+        
+        if (!account) {
+            alert('Vui lòng nhập tài khoản');
+            return;
+        }
+        
+        // Here you would typically save to localStorage or a database
+        alert(`Đã lưu tài khoản ${account} cho ứng dụng ${app}`);
+        document.getElementById('accountInput').value = '';
+    }
+
+    function copyToClipboard(text) {
+        navigator.clipboard.writeText(text).then(function() {
+            alert('Đã sao chép: ' + text);
+        }, function(err) {
+            console.error('Không thể sao chép: ', err);
+        });
+    }
+</script>
 
 </body>
 </html>
