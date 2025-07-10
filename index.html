@@ -19,6 +19,14 @@
     .animate-slide-in {
       animation: slideIn 0.3s ease-out;
     }
+    .collapsible {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.5s ease;
+    }
+    .collapsible.expanded {
+      max-height: 9999px;
+    }
   </style>
 </head>
 <body class="bg-gradient-to-br from-indigo-100 via-pink-100 to-yellow-100 min-h-screen p-6">
@@ -75,7 +83,7 @@
               </div>
               <span class="text-${platform.color}-700 font-bold text-lg select-none">▼</span>
             </div>
-            <div id="${platform.key}_content" class="p-4 space-y-4">
+            <div id="${platform.key}_content" class="p-4 space-y-4 collapsible">
               <button onclick="addAccount('${platform.key}')" class="bg-${platform.color}-600 hover:bg-${platform.color}-700 text-white px-4 py-2 rounded-xl">+ Thêm tài khoản</button>
               <div id="${platform.key}_accounts" class="space-y-4"></div>
             </div>
@@ -85,13 +93,13 @@
 
         const dataList = savedData[platform.key] || [];
         dataList.forEach(data => addAccount(platform.key, data));
-        if (dataList.length === 0) addAccount(platform.key); // Thêm mặc định nếu chưa có
+        if (dataList.length === 0) addAccount(platform.key);
       });
     }
 
     function toggleCollapse(key) {
       const content = document.getElementById(`${key}_content`);
-      content.classList.toggle('hidden');
+      content.classList.toggle('expanded');
     }
 
     function addAccount(platformKey, existingData = null) {
@@ -104,7 +112,7 @@
       const cookie = existingData?.cookie || "";
 
       const html = `
-        <div id="${id}" class="bg-gray-50 border rounded-xl p-4 space-y-3 shadow relative group">
+        <div id="${id}" class="bg-gray-50 border rounded-2xl p-4 space-y-3 shadow relative group">
           <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
             <button onclick="removeAccount('${id}', '${platformKey}')" class="bg-red-500 hover:bg-red-600 text-white px-2 rounded-xl">X</button>
           </div>
@@ -146,7 +154,7 @@
 
     function removeAccount(id, platformKey) {
       document.getElementById(id).remove();
-      saveAccount(platformKey); // cập nhật lại sau khi xóa
+      saveAccount(platformKey);
     }
 
     function copyField(fieldId) {
