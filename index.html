@@ -114,7 +114,10 @@
 
     function renderPlatforms() {
       const container = document.getElementById('networks');
-      const savedData = JSON.parse(localStorage.getItem('accounts')) || {};
+      async function renderPlatforms() {
+        const res = await fetch('data.json');
+        const allData = await res.json();
+        const savedData = allData.accounts || {};
       socialPlatforms.forEach(platform => {
         counters[platform.key] = 1;
         const section = document.createElement('div');
@@ -137,7 +140,7 @@
         dataList.forEach(data => addAccount(platform.key, data));
         if (dataList.length === 0) addAccount(platform.key);
       });
-      const savedInfo = JSON.parse(localStorage.getItem('info')) || {};
+      const savedInfo = allData.info || {};
       if (savedInfo.author) document.getElementById('author').value = savedInfo.author;
       if (savedInfo.downloadLink) document.getElementById('download-link').value = savedInfo.downloadLink;
     }
@@ -207,7 +210,7 @@
       document.getElementById(`${id}_cookie`).value = '';
     }
 
-    function saveAccount(platformKey) {
+    async function saveAccount(platformKey) {
       const container = document.getElementById(`${platformKey}_accounts`);
       const children = Array.from(container.children);
       const data = children.map(el => {
@@ -218,21 +221,40 @@
           cookie: document.getElementById(`${id}_cookie`).value,
         };
       });
+
       try {
-        const existing = JSON.parse(localStorage.getItem('accounts')) || {};
-        existing[platformKey] = data;
-        localStorage.setItem('accounts', JSON.stringify(existing));
+        const res = await fetch('data.json');
+        const allData = await res.json();
+        allData.accounts = allData.accounts || {};
+        allData.accounts[platformKey] = data;
+
+        await fetch('save.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(allData)
+        });
+
         showToast(`Đã lưu tài khoản ${platformKey.toUpperCase()}`);
       } catch (e) {
         showToast("Lỗi khi lưu dữ liệu!", "error");
       }
     }
 
-    function saveInfo() {
+    async function saveInfo() {
       const author = document.getElementById('author').value;
       const downloadLink = document.getElementById('download-link').value;
+
       try {
-        localStorage.setItem('info', JSON.stringify({ author, downloadLink }));
+        const res = await fetch('data.json');
+        const allData = await res.json();
+        allData.info = { author, downloadLink };
+
+        await fetch('save.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(allData)
+        });
+
         showToast("Đã lưu thông tin cá nhân");
       } catch (e) {
         showToast("Lỗi khi lưu thông tin", "error");
