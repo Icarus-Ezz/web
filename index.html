@@ -114,10 +114,7 @@
 
     function renderPlatforms() {
       const container = document.getElementById('networks');
-      async function renderPlatforms() {
-        const res = await fetch('data.json');
-        const allData = await res.json();
-        const savedData = allData.accounts || {};
+      const savedData = JSON.parse(localStorage.getItem('accounts')) || {};
       socialPlatforms.forEach(platform => {
         counters[platform.key] = 1;
         const section = document.createElement('div');
@@ -140,7 +137,7 @@
         dataList.forEach(data => addAccount(platform.key, data));
         if (dataList.length === 0) addAccount(platform.key);
       });
-      const savedInfo = allData.info || {};
+      const savedInfo = JSON.parse(localStorage.getItem('info')) || {};
       if (savedInfo.author) document.getElementById('author').value = savedInfo.author;
       if (savedInfo.downloadLink) document.getElementById('download-link').value = savedInfo.downloadLink;
     }
@@ -210,7 +207,7 @@
       document.getElementById(`${id}_cookie`).value = '';
     }
 
-    async function saveAccount(platformKey) {
+    function saveAccount(platformKey) {
       const container = document.getElementById(`${platformKey}_accounts`);
       const children = Array.from(container.children);
       const data = children.map(el => {
@@ -221,40 +218,21 @@
           cookie: document.getElementById(`${id}_cookie`).value,
         };
       });
-
       try {
-        const res = await fetch('data.json');
-        const allData = await res.json();
-        allData.accounts = allData.accounts || {};
-        allData.accounts[platformKey] = data;
-
-        await fetch('save.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(allData)
-        });
-
+        const existing = JSON.parse(localStorage.getItem('accounts')) || {};
+        existing[platformKey] = data;
+        localStorage.setItem('accounts', JSON.stringify(existing));
         showToast(`Đã lưu tài khoản ${platformKey.toUpperCase()}`);
       } catch (e) {
         showToast("Lỗi khi lưu dữ liệu!", "error");
       }
     }
 
-    async function saveInfo() {
+    function saveInfo() {
       const author = document.getElementById('author').value;
       const downloadLink = document.getElementById('download-link').value;
-
       try {
-        const res = await fetch('data.json');
-        const allData = await res.json();
-        allData.info = { author, downloadLink };
-
-        await fetch('save.php', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(allData)
-        });
-
+        localStorage.setItem('info', JSON.stringify({ author, downloadLink }));
         showToast("Đã lưu thông tin cá nhân");
       } catch (e) {
         showToast("Lỗi khi lưu thông tin", "error");
@@ -275,21 +253,18 @@
       }
     }
 
-    async function exportData() {
-      try {
-        const res = await fetch('data.json');
-        const data = await res.json();
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'backup_tai_khoan.json';
-        a.click();
-        URL.revokeObjectURL(url);
-        showToast("Đã xuất dữ liệu thành công");
-      } catch {
-        showToast("Lỗi khi xuất dữ liệu", "error");
-      }
+    function exportData() {
+      const accounts = JSON.parse(localStorage.getItem('accounts')) || {};
+      const info = JSON.parse(localStorage.getItem('info')) || {};
+      const data = { accounts, info };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'backup_tai_khoan.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Đã xuất dữ liệu thành công");
     }
 
     function importData(event) {
@@ -297,16 +272,11 @@
       if (!file) return showToast("Không có file được chọn", "error");
 
       const reader = new FileReader();
-      reader.onload = async function(e) {
+      reader.onload = function(e) {
         try {
           const data = JSON.parse(e.target.result);
-
-          await fetch('save.php', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-          });
-
+          if (data.accounts) localStorage.setItem('accounts', JSON.stringify(data.accounts));
+          if (data.info) localStorage.setItem('info', JSON.stringify(data.info));
           showToast("Đã nhập dữ liệu thành công! Đang tải lại...");
           setTimeout(() => location.reload(), 1000);
         } catch (err) {
