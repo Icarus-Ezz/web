@@ -74,8 +74,13 @@
         </ul>
       </div>
 
-      <div class="flex justify-end">
-        <button onclick="saveInfo()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">Lưu thông tin</button>
+      <div class="flex flex-wrap gap-3 justify-end">
+        <button onclick="saveInfo()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl">💾 Lưu thông tin</button>
+        <button onclick="exportData()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl">📤 Xuất dữ liệu</button>
+        <label class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-xl cursor-pointer">
+          📥 Nhập dữ liệu
+          <input type="file" accept=".json" onchange="importData(event)" class="hidden">
+        </label>
       </div>
     </div>
   </div>
@@ -246,6 +251,39 @@
         document.getElementById('info-tab').classList.remove('hidden');
         document.querySelectorAll('.tab-button')[1].classList.add('bg-purple-600', 'text-white');
       }
+    }
+
+    function exportData() {
+      const accounts = JSON.parse(localStorage.getItem('accounts')) || {};
+      const info = JSON.parse(localStorage.getItem('info')) || {};
+      const data = { accounts, info };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'backup_tai_khoan.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast("Đã xuất dữ liệu thành công");
+    }
+
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return showToast("Không có file được chọn", "error");
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.accounts) localStorage.setItem('accounts', JSON.stringify(data.accounts));
+          if (data.info) localStorage.setItem('info', JSON.stringify(data.info));
+          showToast("Đã nhập dữ liệu thành công! Đang tải lại...");
+          setTimeout(() => location.reload(), 1000);
+        } catch (err) {
+          showToast("Lỗi khi đọc file dữ liệu", "error");
+        }
+      };
+      reader.readAsText(file);
     }
 
     window.onload = renderPlatforms;
