@@ -275,18 +275,21 @@
       }
     }
 
-    function exportData() {
-      const accounts = JSON.parse(localStorage.getItem('accounts')) || {};
-      const info = JSON.parse(localStorage.getItem('info')) || {};
-      const data = { accounts, info };
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'backup_tai_khoan.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast("Đã xuất dữ liệu thành công");
+    async function exportData() {
+      try {
+        const res = await fetch('data.json');
+        const data = await res.json();
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'backup_tai_khoan.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast("Đã xuất dữ liệu thành công");
+      } catch {
+        showToast("Lỗi khi xuất dữ liệu", "error");
+      }
     }
 
     function importData(event) {
@@ -294,11 +297,16 @@
       if (!file) return showToast("Không có file được chọn", "error");
 
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = async function(e) {
         try {
           const data = JSON.parse(e.target.result);
-          if (data.accounts) localStorage.setItem('accounts', JSON.stringify(data.accounts));
-          if (data.info) localStorage.setItem('info', JSON.stringify(data.info));
+
+          await fetch('save.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+          });
+
           showToast("Đã nhập dữ liệu thành công! Đang tải lại...");
           setTimeout(() => location.reload(), 1000);
         } catch (err) {
