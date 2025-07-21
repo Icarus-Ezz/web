@@ -145,8 +145,10 @@
         dataList.forEach(data => addAccount(platform.key, data));
         if (dataList.length === 0) addAccount(platform.key);
       });
+      
       const savedInfo = JSON.parse(localStorage.getItem('info')) || {};
       if (savedInfo.author) document.getElementById('author').value = savedInfo.author;
+      if (savedInfo.author2) document.getElementById('author2').value = savedInfo.author2;
       if (savedInfo.downloadLink) document.getElementById('download-link').value = savedInfo.downloadLink;
     }
 
