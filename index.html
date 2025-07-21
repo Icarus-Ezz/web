@@ -241,7 +241,7 @@
       const author2 = document.getElementById('author2').value;
       const downloadLink = document.getElementById('download-link').value;
       try {
-        localStorage.setItem('info', JSON.stringify({ author, downloadLink }));
+        localStorage.setItem('info', JSON.stringify({ author, author2, downloadLink }));
         showToast("Đã lưu thông tin cá nhân");
       } catch (e) {
         showToast("Lỗi khi lưu thông tin", "error");
