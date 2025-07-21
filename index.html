@@ -59,7 +59,7 @@
       <div class="bg-gray-100 p-4 rounded-xl space-y-3">
         <label class="block font-semibold">Authorization 2:</label>
         <div class="flex gap-2">
-          <input id="author" class="flex-1 px-3 py-2 border rounded-xl" value="">
+          <input id="author2" class="flex-1 px-3 py-2 border rounded-xl" value="">
           <button onclick="copyField('author')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
         </div>
       </div>
@@ -238,6 +238,7 @@
 
     function saveInfo() {
       const author = document.getElementById('author').value;
+      const author2 = document.getElementById('author2').value;
       const downloadLink = document.getElementById('download-link').value;
       try {
         localStorage.setItem('info', JSON.stringify({ author, downloadLink }));
