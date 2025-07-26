@@ -63,6 +63,14 @@
           <button onclick="copyField('author2')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
         </div>
       </div>
+
+      <div class="bg-gray-100 p-4 rounded-xl space-y-3">
+        <label class="block font-semibold">Authorization 3:</label>
+        <div class="flex gap-2">
+          <input id="author3" class="flex-1 px-3 py-2 border rounded-xl" value="">
+          <button onclick="copyField('author3')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
+        </div>
+      </div>
       
       <div class="bg-gray-100 p-4 rounded-xl space-y-3">
         <label class="block font-semibold">Link tải:</label>
@@ -150,6 +158,7 @@
       const savedInfo = JSON.parse(localStorage.getItem('info')) || {};
       if (savedInfo.author) document.getElementById('author').value = savedInfo.author;
       if (savedInfo.author2) document.getElementById('author2').value = savedInfo.author2;
+      if (savedInfo.author3) document.getElementById('author3').value = savedInfo.author3;
       if (savedInfo.downloadLink) document.getElementById('download-link').value = savedInfo.downloadLink;
     }
 
@@ -242,9 +251,10 @@
     function saveInfo() {
       const author = document.getElementById('author').value;
       const author2 = document.getElementById('author2').value;
+      const author3 = document.getElementById('author3').value;
       const downloadLink = document.getElementById('download-link').value;
       try {
-        localStorage.setItem('info', JSON.stringify({ author, author2, downloadLink }));
+        localStorage.setItem('info', JSON.stringify({ author, author2, author3, downloadLink }));
         showToast("Đã lưu thông tin cá nhân");
       } catch (e) {
         showToast("Lỗi khi lưu thông tin", "error");
