@@ -168,51 +168,37 @@
       const html = `
         <div id="${id}" class="bg-gray-50 border rounded-2xl p-4 space-y-3 shadow relative group">
           <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition">
-            <button onclick="document.getElementById('${id}').remove(); saveGolikeAccounts();" class="bg-red-500 hover:bg-red-600 text-white px-2 rounded-xl">X</button>
+            <button onclick="removeAccount('${id}', '${platformKey}')" class="bg-red-500 hover:bg-red-600 text-white px-2 rounded-xl">X</button>
           </div>
-          <div class="font-bold text-gray-700">Tk Golike #${golikeCounter - 1}</div>
+          <div class="font-bold text-gray-700">Tài khoản #${accountNumber}</div>
           <div>
             <label class="block text-sm font-medium">Tài khoản</label>
-            <input id="${id}_username" class="w-full px-3 py-2 border rounded-xl" value="${username}">
+            <div class="flex gap-2">
+              <input id="${id}_username" class="flex-1 px-3 py-2 border rounded-xl" value="${username}">
+              <button onclick="copyField('${id}_username')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
+            </div>
           </div>
           <div>
             <label class="block text-sm font-medium">Mật khẩu</label>
-            <input id="${id}_password" class="w-full px-3 py-2 border rounded-xl" value="${password}">
+            <div class="flex gap-2">
+              <input id="${id}_password" type="password" class="flex-1 px-3 py-2 border rounded-xl" value="${password}">
+              <button onclick="copyField('${id}_password')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
+            </div>
           </div>
           <div>
             <label class="block text-sm font-medium">Cookie</label>
-            <textarea id="${id}_cookie" rows="2" class="w-full px-3 py-2 border rounded-xl">${cookie}</textarea>
+            <div class="flex gap-2">
+              <textarea id="${id}_cookie" rows="2" class="flex-1 px-3 py-2 border rounded-xl">${cookie}</textarea>
+              <button onclick="copyField('${id}_cookie')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl h-fit">Copy</button>
+            </div>
           </div>
-          <div class="flex justify-end">
-            <button onclick="saveGolikeAccounts()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-xl">Lưu</button>
+          <div class="flex gap-2 justify-end">
+            <button onclick="resetAccount('${id}')" class="bg-gray-400 hover:bg-gray-500 text-white px-4 py-1.5 rounded-xl">Hủy</button>
+            <button onclick="saveAccount('${platformKey}')" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-xl">Lưu</button>
           </div>
         </div>`;
       container.insertAdjacentHTML('beforeend', html);
     }
-    function saveGolikeAccounts() {
-      const container = document.getElementById('golike_accounts');
-      const children = Array.from(container.children);
-      const data = children.map(el => {
-        const id = el.id;
-        return {
-          username: document.getElementById(`${id}_username`).value,
-          password: document.getElementById(`${id}_password`).value,
-          cookie: document.getElementById(`${id}_cookie`).value
-        };
-      });
-      const existing = JSON.parse(localStorage.getItem('accounts')) || {};
-      existing.golike = data;
-      localStorage.setItem('accounts', JSON.stringify(existing));
-      showToast("Đã lưu TK Golike");
-    }
-    const oldRender = renderPlatforms;
-    renderPlatforms = function () {
-      oldRender();
-      const savedData = JSON.parse(localStorage.getItem('accounts')) || {};
-      const golikeList = savedData.golike || [];
-      golikeList.forEach(data => addGolikeAccount(data));
-      if (golikeList.length === 0) addGolikeAccount();
-    };
 
     function removeAccount(id, platformKey) {
       document.getElementById(id).remove();
