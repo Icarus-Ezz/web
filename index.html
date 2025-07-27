@@ -33,21 +33,18 @@
 
   <div class="max-w-6xl mx-auto space-y-8">
     <h1 class="text-4xl font-bold text-center text-purple-700 mb-6">Quản lý tài khoản mạng xã hội</h1>
-
-    <button onclick="addGoLike()" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-xl">+ Thêm GoLike</button>
-    <div id="golike-list" class="space-y-6 mt-4"></div>
-
     <!-- Tabs -->
     <div class="flex justify-center mb-4">
       <button onclick="switchTab('main')" class="tab-button bg-purple-600 text-white px-4 py-2 rounded-l-xl">Danh sách tài khoản</button>
-      <button onclick="switchTab('info')" class="tab-button bg-purple-200 hover:bg-purple-300 text-purple-700 px-4 py-2 rounded-r-xl">Thông tin</button>
+      <button onclick="switchTab('info')" class="tab-button bg-purple-200 hover:bg-purple-300 text-purple-700 px-4 py-2">Thông tin</button>
+      <button onclick="switchTab('create')" class="tab-button bg-purple-200 hover:bg-purple-300 text-purple-700 px-4 py-2 rounded-r-xl">Tạo GoLike</button>
     </div>
 
     <!-- Tab Content -->
     <div id="main-tab" class="tab-content">
       <div id="networks" class="space-y-6"></div>
     </div>
-
+    
     <div id="info-tab" class="tab-content hidden bg-white rounded-2xl shadow p-6 space-y-4">
       <h2 class="text-2xl font-bold text-purple-700 mb-4">Thông tin</h2>
 
@@ -102,7 +99,24 @@
         </label>
       </div>
     </div>
-  </div>
+
+    <div id="create-tab" class="tab-content hidden bg-white rounded-2xl shadow p-6 space-y-4">
+      <h2 class="text-2xl font-bold text-purple-700 mb-4">Tạo tài khoản GoLike</h2>
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-1">Tài Khoản Golike</label>
+          <input list="golike-suggestions" id="suggested-username" class="w-full px-3 py-2 border rounded-xl" placeholder="Chọn hoặc nhập tài khoản">
+          <datalist id="golike-suggestions"></datalist>
+        </div>
+        <div>
+          <label class="block text-sm font-medium mb-1">Mật khẩu</label>
+          <input type="password" id="new-password" class="w-full px-3 py-2 border rounded-xl" placeholder="Nhập mật khẩu">
+        </div>
+        <div class="flex justify-end">
+          <button onclick="createGoLikeAccount()" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-xl">➕ Tạo tài khoản</button>
+        </div>
+      </div>
+    </div>
 
   <!-- Toast Notifications -->
   <div id="toast-container" class="fixed bottom-4 right-4 space-y-2 z-50"></div>
@@ -117,101 +131,7 @@
       { key: 'sn', name: 'SnapChat', color: 'yellow', icon: 'https://www.freepnglogos.com/uploads/snapchat-logo-png-0.png' },
       { key: 'x', name: 'X-Twitter', color: 'gray', icon: 'https://freepnglogo.com/images/all_img/logo-x-modern-2023-7cbd.png' },
     ];
-    let goLikes = JSON.parse(localStorage.getItem('golikes')) || [];
-    
-    function saveGoLikes() {
-      localStorage.setItem('golikes', JSON.stringify(goLikes));
-    }
 
-    function renderGoLikes() {
-      const list = document.getElementById('golike-list');
-      list.innerHTML = '';
-
-      goLikes.forEach((golike, index) => {
-        const div = document.createElement('div');
-        div.className = 'bg-white rounded-2xl shadow-xl p-4 space-y-4';
-
-        div.innerHTML = `
-          <div class="flex justify-between items-center">
-            <input onchange="updateGoLikeName(${index}, this.value)" class="text-xl font-bold text-purple-700 bg-transparent focus:outline-none" value="${golike.name}" />
-            <div class="space-x-2">
-              <button onclick="toggleCollapse(${index})" class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-xl">Gấp</button>
-              <button onclick="removeGoLike(${index})" class="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-xl">Xóa</button>
-            </div>
-          </div>
-          <div id="golike-content-${index}" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            ${socialPlatforms.map(platform => `
-              <div class="bg-${platform.color}-100 p-3 rounded-xl">
-                <div class="flex justify-between items-center mb-2">
-                  <span class="font-bold text-${platform.color}-700">${platform.name}</span>
-                  <button onclick="savePlatform('${platform.key}', ${index})" class="text-xs bg-${platform.color}-600 text-white px-2 py-1 rounded">Lưu ${platform.name}</button>
-                </div>
-                ${(golike.accounts[platform.key] || []).map((acc, i) => `
-                  <div class="bg-white border rounded-xl p-2 mb-2">
-                    <input class="w-full mb-1 px-2 py-1 border rounded" placeholder="Tài khoản" value="${acc.username}" onchange="updateAccount(${index}, '${platform.key}', ${i}, 'username', this.value)" />
-                    <input class="w-full mb-1 px-2 py-1 border rounded" placeholder="Mật khẩu" value="${acc.password}" onchange="updateAccount(${index}, '${platform.key}', ${i}, 'password', this.value)" />
-                    <textarea class="w-full px-2 py-1 border rounded" placeholder="Cookie" onchange="updateAccount(${index}, '${platform.key}', ${i}, 'cookie', this.value)">${acc.cookie}</textarea>
-                    <button onclick="removeAccount(${index}, '${platform.key}', ${i})" class="mt-1 bg-red-400 hover:bg-red-500 text-white px-2 py-1 rounded">Xóa</button>
-                  </div>`).join('')}
-                <button onclick="addAccount(${index}, '${platform.key}')" class="bg-${platform.color}-600 hover:bg-${platform.color}-700 text-white px-3 py-1 rounded-xl">+ Thêm tài khoản</button>
-              </div>
-            `).join('')}
-          </div>
-        `;
-
-        list.appendChild(div);
-      });
-    }
-
-    function addGoLike() {
-      goLikes.push({ name: `GoLike ${goLikes.length + 1}`, accounts: {} });
-      saveGoLikes();
-      renderGoLikes();
-    }
-
-    function removeGoLike(index) {
-      if (confirm('Bạn có chắc muốn xoá GoLike này?')) {
-        goLikes.splice(index, 1);
-        saveGoLikes();
-        renderGoLikes();
-      }
-    }
-
-    function updateGoLikeName(index, name) {
-      goLikes[index].name = name;
-      saveGoLikes();
-    }
-
-    function addAccount(golikeIndex, platformKey) {
-      if (!goLikes[golikeIndex].accounts[platformKey]) goLikes[golikeIndex].accounts[platformKey] = [];
-      goLikes[golikeIndex].accounts[platformKey].push({ username: '', password: '', cookie: '' });
-      saveGoLikes();
-      renderGoLikes();
-    }
-
-    function removeAccount(golikeIndex, platformKey, accIndex) {
-      goLikes[golikeIndex].accounts[platformKey].splice(accIndex, 1);
-      saveGoLikes();
-      renderGoLikes();
-    }
-
-    function updateAccount(golikeIndex, platformKey, accIndex, field, value) {
-      goLikes[golikeIndex].accounts[platformKey][accIndex][field] = value;
-      saveGoLikes();
-    }
-
-    function toggleCollapse(index) {
-      const el = document.getElementById(`golike-content-${index}`);
-      el.classList.toggle('hidden');
-    }
-
-    function savePlatform(platformKey, golikeIndex) {
-      alert(`Đã lưu ${socialPlatforms.find(p => p.key === platformKey).name} của GoLike ${golikeIndex + 1}`);
-      saveGoLikes();
-    }
-
-    window.onload = renderGoLikes;
-    
     const counters = {};
 
     function showToast(message, type = 'success') {
@@ -270,6 +190,7 @@
       const accountNumber = counters[platformKey] - 1;
       const username = existingData?.username || "";
       const password = existingData?.password || "";
+      const displayName = existingData?.displayName || "";
       const cookie = existingData?.cookie || "";
       const html = `
         <div id="${id}" class="bg-gray-50 border rounded-2xl p-4 space-y-3 shadow relative group">
@@ -277,6 +198,15 @@
             <button onclick="removeAccount('${id}', '${platformKey}')" class="bg-red-500 hover:bg-red-600 text-white px-2 rounded-xl">X</button>
           </div>
           <div class="font-bold text-gray-700">Tài khoản #${accountNumber}</div>
+
+          <div>
+            <label class="block text-sm font-medium">Tên Acc GoLike</label>
+            <div class="flex gap-2">
+              <input id="${id}_displayName" class="flex-1 px-3 py-2 border rounded-xl" value="${displayName}">
+              <button onclick="copyField('${id}_displayName')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
+            </div>
+          </div>
+          
           <div>
             <label class="block text-sm font-medium">Tài khoản</label>
             <div class="flex gap-2">
@@ -284,6 +214,7 @@
               <button onclick="copyField('${id}_username')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
             </div>
           </div>
+          
           <div>
             <label class="block text-sm font-medium">Mật khẩu</label>
             <div class="flex gap-2">
@@ -291,6 +222,7 @@
               <button onclick="copyField('${id}_password')" class="bg-yellow-400 hover:bg-yellow-500 text-white px-3 rounded-xl">Copy</button>
             </div>
           </div>
+          
           <div>
             <label class="block text-sm font-medium">Cookie</label>
             <div class="flex gap-2">
@@ -384,6 +316,52 @@
       a.click();
       URL.revokeObjectURL(url);
       showToast("Đã xuất dữ liệu thành công");
+    }
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.add('hidden'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('bg-purple-600', 'text-white'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.add('bg-purple-200', 'text-purple-700'));
+    
+      if (tab === 'main') {
+        document.getElementById('main-tab').classList.remove('hidden');
+        document.querySelectorAll('.tab-button')[0].classList.add('bg-purple-600', 'text-white');
+      } else if (tab === 'info') {
+        document.getElementById('info-tab').classList.remove('hidden');
+        document.querySelectorAll('.tab-button')[1].classList.add('bg-purple-600', 'text-white');
+      } else {
+        document.getElementById('create-tab').classList.remove('hidden');
+        document.querySelectorAll('.tab-button')[2].classList.add('bg-purple-600', 'text-white');
+        populateSuggestions(); // <- cập nhật gợi ý khi vào tab
+      }
+    }
+    
+    function populateSuggestions() {
+      const data = JSON.parse(localStorage.getItem('accounts')) || {};
+      const golikeAccounts = Object.values(data)
+        .flat()
+        .map(acc => acc?.displayName || acc?.username)
+        .filter(Boolean);
+      const datalist = document.getElementById('golike-suggestions');
+      datalist.innerHTML = "";
+      golikeAccounts.forEach(acc => {
+        const option = document.createElement("option");
+        option.value = acc;
+        datalist.appendChild(option);
+      });
+    }
+    
+    function createGoLikeAccount() {
+      const username = document.getElementById('suggested-username').value.trim();
+      const password = document.getElementById('new-password').value.trim();
+      if (!username || !password) return showToast("Vui lòng nhập đầy đủ tài khoản và mật khẩu", "error");
+    
+      const accounts = JSON.parse(localStorage.getItem('accounts')) || {};
+      accounts['fb'] = accounts['fb'] || [];  // hoặc bất kỳ key nào bạn muốn dùng cho GoLike
+      accounts['fb'].push({ username, password, cookie: "", displayName: username });
+      localStorage.setItem('accounts', JSON.stringify(accounts));
+      showToast("Đã thêm tài khoản GoLike mới!");
+      document.getElementById('suggested-username').value = "";
+      document.getElementById('new-password').value = "";
     }
 
     function importData(event) {
